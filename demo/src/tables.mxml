@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx"
+				   minWidth="90" minHeight="50" 
+				   buttonMode="true"
+				   mouseOver="bordercontainer1_mouseOverHandler(event)"
+				   mouseOut="bordercontainer1_mouseOutHandler(event)"
+				   preinitialize="initApp()"
+				   >
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<mx:Glow id="glowGraphic" duration="800" alphaFrom="1.0" alphaTo="0.1" blurXFrom="0.0" blurXTo="50.0" blurYFrom="0.0" blurYTo="50.0" color="0x0000ff"/>
+	</fx:Declarations>
+		<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			import com.esri.ags.geometry.MapPoint;
+			
+			import mx.events.FlexEvent;
+			[Bindable]
+			public var dlobj:Object;
+			private var _data:Object;
+			
+			private function initApp():void {
+				this.width=230;this.height=80;
+			}
+			public function get data():Object
+			{
+				return _data;
+			}
+			
+			public function set data(value:Object):void
+			{
+				_data = value;
+			}
+			public function set dataLabel(obj:Object){
+				dlobj=obj;
+			}
+			
+			
+			
+			//			protected function dlname_preinitializeHandler(event:FlexEvent):void
+			//			{
+			//					dlname.setStyle("fontSize",16);
+			//			}
+			
+			protected function bordercontainer1_mouseOverHandler(event:MouseEvent):void
+			{
+				this.setStyle("backgroundColor","#345345");
+				var point:MapPoint = dlobj.graphic.geometry as MapPoint;
+				
+				//map.centerAt(point);
+				
+				glowGraphic.target = dlobj.graphic;
+				glowGraphic.end();
+				glowGraphic.play();
+				glowGraphic.target = null;
+				
+			}
+			
+			protected function bordercontainer1_mouseOutHandler(event:MouseEvent):void
+			{
+				this.setStyle("backgroundColor","#ffffff");
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup width="{this.width}" height="80" gap="5" verticalAlign="middle" >
+		<mx:HBox width="100%" textAlign="center" fontSize="13">
+			<s:Label width="50" text="名称：" textAlign="center"/>
+			<s:Label fontFamily="宋体" text="{dlobj.NAME}"    />
+		</mx:HBox>
+		<mx:HBox width="100%"  textAlign="center" fontSize="13">
+			<s:Label width="50" text="地址："  />
+			<s:Label fontFamily="宋体" text="{dlobj.ADDRESS}"  />
+		</mx:HBox>
+		<mx:HBox width="100%"  textAlign="center"  fontSize="13">
+			<s:Label width="50" text="电话：" textAlign="center" />
+			<s:Label fontFamily="宋体" text="{dlobj.TELEPHONE}"    />
+		</mx:HBox>
+	</s:VGroup>
+</s:BorderContainer>

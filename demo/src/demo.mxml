@@ -1,0 +1,748 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx"
+				   xmlns:esri="http://www.esri.com/2008/ags"
+				   creationComplete="initJTY()"
+				   fontFamily="宋体"
+				   minWidth="90" minHeight="50" 
+				   >
+	<!--  preinitialize="initApp()"-->
+	<fx:Declarations>
+		<mx:Glow id="glowGraphic" duration="800" alphaFrom="1.0" alphaTo="0.1" blurXFrom="0.0" blurXTo="50.0" blurYFrom="0.0" blurYTo="50.0" color="0x0000ff"/>
+		
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	    
+		<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+	    </fx:Style>
+	<fx:Script>
+		<![CDATA[
+			import com.TianDiTuLayer;
+			import com.adobe.serialization.json.JSON;
+			import com.adobe.utils.StringUtil;
+			import com.esri.ags.FeatureSet;
+			import com.esri.ags.Graphic;
+			import com.esri.ags.geometry.Extent;
+			import com.esri.ags.geometry.Geometry;
+			import com.esri.ags.geometry.MapPoint;
+			import com.esri.ags.geometry.Polyline;
+			import com.esri.ags.layers.ArcGISTiledMapServiceLayer;
+			import com.esri.ags.layers.GraphicsLayer;
+			import com.esri.ags.layers.Layer;
+			import com.esri.ags.layers.supportClasses.LOD;
+			import com.esri.ags.symbols.PictureMarkerSymbol;
+			import com.esri.ags.symbols.SimpleFillSymbol;
+			import com.esri.ags.symbols.SimpleLineSymbol;
+			import com.esri.ags.symbols.Symbol;
+			import com.esri.ags.tasks.QueryTask;
+			import com.esri.ags.tasks.supportClasses.Query;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.rpc.AsyncResponder;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.http.HTTPService;
+
+			private var geo:Geometry;
+			
+			[Bindable]
+			public var navQueryqdResultsArr:ArrayCollection;
+			[Bindable]
+			public var navQueryzdResultsArr:ArrayCollection;
+			[Bindable]
+			private var navrouteQueryResultsArr:ArrayCollection;
+			
+			private var navStrArr:Array = new Array(2);
+			
+			function initJTY():void{
+				map.lods=[ 
+					new LOD(0,0.7031250000000002, 2.9549759305875003E8),
+					new LOD(1 ,0.3515625000000001, 1.4774879652937502E8),                                   
+					new LOD(2 ,0.17578125000000006, 7.387439826468751E7),   
+					new LOD(3 ,0.08789062500000003, 3.6937199132343754E7),    
+					new LOD(4 ,0.043945312500000014, 1.8468599566171877E7),    
+					new LOD(5 ,0.021972656250000007, 9234299.783085939),   
+					new LOD(6 ,0.010986328125000003, 4617149.891542969),     
+					new LOD(7 ,0.005493164062500002, 2308574.9457714846),     
+					new LOD(8 ,0.002746582031250001, 1154287.4728857423),     
+					new LOD(9 , 0.0013732910156250004, 577143.7364428712),     
+					new LOD(10,6.866455078125002E-4, 288571.8682214356),     
+					new LOD(11, 3.433227539062501E-4, 144285.9341107178),   
+					new LOD(12, 1.7166137695312505E-4,  72142.9670553589),   
+					new LOD(13,  8.583068847656253E-5, 36071.48352767945),    
+					new LOD(14, 4.2915344238281264E-5, 18035.741763839724),    
+					new LOD(15,  2.1457672119140632E-5,  9017.870881919862),   
+					new LOD(16, 1.0728836059570316E-5,  4508.935440959931),    
+					new LOD(17, 5.364418029785158E-6, 2254.4677204799655),    
+					new LOD(18, 2.682209014892579E-6, 1127.2338602399827),
+					new LOD(19,1.3411045074462895E-6,563.6169301199914)
+					
+				];  
+				var wmslayer:ArcGISTiledMapServiceLayer=new ArcGISTiledMapServiceLayer("http://59.215.225.198:8080/OneMapServer/rest/services/DZDT/MapServer");
+				wmslayer.id="wmslayer";
+				wmslayer.visible=true;
+				map.addLayer(Layer(wmslayer),0);
+				map.level=10;
+				map.centerAt(new MapPoint(106.691417,26.712887));//贵州
+			}
+			
+				
+			public function first(qdorzd:String):void
+			{
+				
+			}
+			public function previous(qdorzd:String):void
+			{
+				
+			}
+			public function next(qdorzd:String):void
+			{
+				
+			}
+			public function last(qdorzd:String):void
+			{
+				
+			}
+
+			protected function datagroup1_mouseOverHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var obj:Object;
+				if(event.target.className == "queryResultItemRender")
+				{
+					obj=event.target.data;
+					
+				}
+				else if(event.target.className == "Button")
+				{
+					obj=event.target.parent.parent.data;
+				}
+				else if(event.target.className == "Label")
+				{
+					obj = event.target.parent.parent.parent.data;
+				}
+				else if(event.target.className == "VBox")
+				{
+					obj = event.target.parent.parent.data;
+				}
+				if(obj)
+				{
+					var point:MapPoint = obj.graphic.geometry as MapPoint;
+					
+					//map.centerAt(point);
+					
+					glowGraphic.target = obj.graphic;
+					glowGraphic.end();
+					glowGraphic.play();
+					glowGraphic.target = null;
+				}
+			}
+			
+			private var startPositionName:String = "";
+			private var endPositionName:String = "";
+			
+			protected function datagroup1_clickHandler(event:MouseEvent):void
+			{
+				
+				if(event.target.id == "bt")
+				{
+					var obj:Object=event.target.parent.parent.data;
+					startPositionName = obj.NAME;				
+					startPoint = obj.graphic.geometry as MapPoint;
+					num=num+1;
+					if(num==2)
+					{
+						var query:String=navStrPre + "?postStr={'startposition':'"+startPoint.x + "," + startPoint.y+"','endposition':'" + endPoint.x + ","+ endPoint.y + "',linetype:'1'}&type=busline" ;
+						dorouteQuery(query);
+						num=0;
+					}
+				}
+				
+			}
+			private function dorouteQuery(url:String):void
+			{
+				var httpservice:HTTPService = new HTTPService();
+				httpservice=new HTTPService();  
+				httpservice.method="GET";  
+				httpservice.useProxy=false;  
+				httpservice.resultFormat=HTTPService.RESULT_FORMAT_E4X;  
+				httpservice.addEventListener(ResultEvent.RESULT, httpResult);  
+				httpservice.url=url;  
+				httpservice.send();  
+			}
+			
+			private function httpResult(event:ResultEvent):void
+			{
+				var result:Object = event.result;
+				analysisResult(result);
+			}
+			
+			
+			protected function datagroup2_clickHandler(event:MouseEvent):void
+			{
+			}
+			
+			protected function datagroup3_clickHandler(event:MouseEvent):void
+			{
+				
+				if(event.target.id == "bt")
+				{
+					var obj:Object=event.target.parent.parent.data;
+					endPositionName = obj.NAME;				
+					endPoint = obj.graphic.geometry as MapPoint;
+					num=num+1;
+					if(num==2)
+					{
+						var query:String=navStrPre + "?postStr={'startposition':'"+startPoint.x + "," + startPoint.y+"','endposition':'" + endPoint.x + ","+ endPoint.y + "',linetype:'1'}&type=busline" ;
+						dorouteQuery(query);
+						num=0;
+					}
+				}
+			}
+ 
+			private var num:int=0;
+			private var startPoint:MapPoint;
+			private var endPoint:MapPoint; 
+			private var navStrPre:String = "http://59.255.48.160/query.shtml";
+			private var queryStr:String = "";
+			private var queryStr1:String="";
+			public function dhcxClick(str:String):void
+			{
+				// TODO Auto-generated method stub
+				if(qdInput.text=="")
+					return;
+				if(zdInput.text=="")
+					return;
+				//startPoint = mapPoint;
+				
+				var restStr:String = "";
+				var type:String = "";
+				var keyWordArr:Array = qdInput.text.split(";");
+				
+				for each(var keyword:String in keyWordArr)
+				{
+					queryStr += "NAME like '%" + StringUtil.trim(keyword) + "%' or ";
+				}
+				queryStr = queryStr.slice(0,-4);
+				
+				var restStr1:String = "";
+				var type1:String = "";
+				var keyWordArr1:Array = zdInput.text.split(";");
+				
+				for each(var keyword1:String in keyWordArr1)
+				{
+					queryStr1 += "NAME like '%" + StringUtil.trim(keyword1) + "%' or ";
+				}
+				queryStr1 = queryStr1.slice(0,-4);
+
+				doquery("http://59.215.225.198:8080/OneMapServer/rest/services/GZ_POI/MapServer/0",queryStr,false);
+				
+				doquery("http://59.215.225.198:8080/OneMapServer/rest/services/GZ_POI/MapServer/0",queryStr1,true);
+			}
+			
+			private var doqueryzd:Boolean=false;
+			
+			public function doquery(url:String,whereString:String,iszd:Boolean):void
+			{
+				if(iszd)
+				{
+					doqueryzd=true;
+				}
+				var queryTask:QueryTask = new QueryTask();
+				queryTask.url=url;
+				var query:Query = new Query();
+				query.outFields=['*'];
+				query.returnGeometry=false;
+				query.where=whereString;
+				queryTask.executeForIds(query,new AsyncResponder(onResult, onFault));
+				function onResult(obj:Object, token:Object = null):void
+				{	
+					executeForIdsOnResult(obj);
+				}
+				function onFault(info:Object, token:Object = null):void
+				{
+					Alert.show(info.toString(), "错误");
+				}
+			}
+			
+			
+			private var objectIdsArray:Array = new Array();
+			private var  total:int=0,currentPage:int=0, pageSize:Number=0;
+			//每页显示的个数
+			private const recordsPerPage:int = 10;
+			[Bindable]
+			private var numberOfPages:int;
+			private function executeForIdsOnResult(obj:Object):void
+			{
+				objectIdsArray = obj as Array;
+				pageSize = objectIdsArray.length / recordsPerPage;
+				numberOfPages=Math.floor(pageSize);
+				
+				if(pageSize - Math.floor(pageSize) >0)
+				{
+					numberOfPages++;
+				}
+				
+				
+				if (numberOfPages > 0)
+				{
+					currentPage = 1;
+					showProject(currentPage);
+				}
+				
+			}
+			
+			public  function showProject(startPageId:int):void{
+				var startIndexObjectIDArrayInPage:int = (startPageId - 1) * recordsPerPage;
+				var endIndexObjectIDArrayInPage:int = startIndexObjectIDArrayInPage + recordsPerPage;
+				if (endIndexObjectIDArrayInPage > objectIdsArray.length)
+				{
+					endIndexObjectIDArrayInPage = objectIdsArray.length;
+				}
+				
+				var queryTask:QueryTask=new QueryTask();
+				queryTask.url = "http://59.215.225.198:8080/OneMapServer/rest/services/GZ_POI/MapServer/0";
+				var query:Query = new Query();
+				if(doqueryzd)
+				{
+					query.where =queryStr1;
+				}
+				else{
+					query.where =queryStr;
+				}
+				query.objectIds = objectIdsArray.slice(startIndexObjectIDArrayInPage, endIndexObjectIDArrayInPage);
+				query.outFields=['*'];
+				query.returnGeometry=true;
+				//perform Query
+				
+				queryTask.execute(query, new AsyncResponder(onResult, onFault));
+				function onResult(obj:FeatureSet, token:Object = null):void
+				{	
+					addList(obj);
+				}
+				function onFault(info:Object, token:Object = null):void
+				{
+					Alert.show(info.toString(), "错误");
+				}
+			}
+			private var locateSym:Symbol = new PictureMarkerSymbol("com/location.png",11,16);
+			
+			private function addList(featureSet:FeatureSet):void{
+				
+				if(doqueryzd)
+				{
+					navQueryzdResultsArr=new ArrayCollection();
+				}
+				else
+				{
+					navQueryqdResultsArr = new ArrayCollection();
+				}
+				var featuresArr:Array = featureSet.features as Array;
+				var xmin:Number=0;
+				var ymin:Number=0;
+				var xmax:Number=0;
+				var ymax:Number=0;
+				for(var i:int=0;i<featureSet.features.length;i++){
+					var obj:Object=featureSet.features[i].attributes;
+					var graphic:Graphic=new Graphic();
+					var geometryObj:Object=featureSet.features[i].geometry;
+					graphic.geometry=geometryObj as Geometry;
+					graphic.attributes=obj;
+					obj.graphic=graphic;
+					if(obj.hasOwnProperty("名称"))
+						obj.NAME = obj.名称;
+					if(doqueryzd)
+					{
+						obj.LABEL = "终点";
+						navQueryzdResultsArr.addItem(obj);
+					}
+					else{
+						obj.LABEL = "起点";
+						navQueryqdResultsArr.addItem(obj);
+					}
+						
+
+					graphic.symbol = locateSym;
+					//routeGraphicsLayer.add(graphic);
+					
+					//graphic.addEventListener(MouseEvent.CLICK,graphicHandle);
+					
+				}
+				/* if(graphicknown)
+				{
+				routeGraphicsLayer.add(graphicknown);
+				graphic.addEventListener(MouseEvent.CLICK,graphicHandle);
+				} */
+//				setPreviousNextVisibility();
+//				for each(var layer:Layer in map.layers)
+//				{
+//					if (layer.id == "wmslayer" || layer.id == "yxLayer")
+//					{
+//						
+//					}
+//					else
+//					{
+//						layer.visible = false;
+//					}
+//				}
+//				if(!map.layers.contains(routeGraphicsLayer))
+//				{
+//					map.addLayer(routeGraphicsLayer);
+//					routeGraphicsLayer.visible = true;
+//				}
+//				else
+//					routeGraphicsLayer.visible = true;
+//				map.extent = new Extent(xmin,ymin,xmax,ymax);
+//				map.zoomOut();
+//				navQueryResult.selectedChild = queryResultPanel;	
+			}
+			
+			
+			/** 
+			 * 判断是否是json结构 
+			 */ 
+			private function isJson(value:String):Boolean
+			{ 
+				try
+				{
+					jsonResult = JSON.decode(value);
+				} 
+				catch(error:Error) 
+				{
+					return false;
+				}
+				return true;
+			} 
+			
+			/** 
+			 * 判断是否是xml结构 
+			 */ 
+			private function isXML(value:String):Boolean 
+			{ 
+				try { 
+					new XMLDocument(value);
+				} 
+				catch (error:Error) { 
+					return false; 
+				} 
+				return true; 
+				
+			}
+			
+			private var jsonResult:Object = new Object;
+			//解析查询结果
+			private function analysisResult(result:Object):void
+			{
+				/* }
+				public function test(result):void
+				{ */
+				if(isJson(result.toString()))//公交查询
+				{
+					navrouteQueryResultsArr = new ArrayCollection();
+					var result:Object = jsonResult.results[0];
+					var plans:int = result.lines.length;
+					
+					var navrouteQueryResult:Object;
+					var navrouteDetail:ArrayCollection;
+					var navrouteDetailper:Object;
+					for (var i:int = 0; i < plans; i++) 
+					{
+						navrouteQueryResult = new Object();
+						//单条公交结果,显示单个方案面板
+						navrouteQueryResult.title = "方案"+ (i + 1) + "："+getLineName(result.lines[i].lineName).join("→") + 
+							"，总时间："+ getDuration(result.lines[i]) + "分钟，总距离：" + getDistance(result.lines[i]) + "公里";
+						
+						navrouteDetail = new ArrayCollection();
+						
+						//显示每个方案的详细信息
+						navrouteDetailper = new Object();
+						navrouteDetailper.txt = "从起点：" + startPositionName +" 出发，"
+						
+						navrouteDetail.addItem(navrouteDetailper);
+						var segmentNum:int = result.lines[i].segments.length;
+						for (var m:int = 0; m < segmentNum; m++) {
+							navrouteDetailper = new Object();
+							var line:Object = result.lines[i].segments[m];
+							var segmentLine:Object = line.segmentLine[0];
+							
+							//经过的公交或地铁的站数
+							var stationCount:String = (segmentLine.segmentStationCount != "") ? "，经过" + segmentLine.segmentStationCount + "站" : "";
+							var obj:Object = new Object();
+							//线路类型1，步行；2，公交；3，地铁；4， 地铁站内换乘
+							if (line.segmentType == 1) {
+								describeStr = "步行约" + segmentLine.segmentDistance + "米，到达" + line.stationEnd.name + "，";
+								
+								///obj = setGraphicline(line,null,symwalkLine);
+							}
+							else if (line.segmentType == 2) {
+								describeStr = "乘坐" + segmentLine.direction + stationCount + "，到达" + line.stationEnd.name + "，";
+								
+								//obj = setGraphicline(line,symbusPoint,symbusLine);
+								
+							}
+							else if (line.segmentType == 3) {
+								describeStr = "乘坐" + segmentLine.direction + stationCount + "，到达" + line.stationEnd.name + "，";
+								
+								//obj = setGraphicline(line,symsubwayPoint,symsubwayLine);
+							}
+							else if (line.segmentType == 4) {
+								describeStr = "站内换乘，";
+							}
+							
+							navrouteDetailper.txt = describeStr;
+							navrouteDetailper.gra = obj;
+							navrouteDetail.addItem(navrouteDetailper);
+						}
+						//去掉最后的逗号
+						describeStr = describeStr.substring(0, describeStr.length - 1);
+						navrouteDetail.removeItemAt(navrouteDetail.length-1);
+						/* navrouteDetail.addItem(describeStr + "终点：" + endPositionName); */
+						describeStr = describeStr + "终点：" + endPositionName;
+						//navrouteDetailper = new Object();//navrouteDetailper Object不重新实例化，可以实现只修改txt属性，而保持gra属性不变
+						navrouteDetailper.txt = describeStr;
+						navrouteDetail.addItem(navrouteDetailper);
+						
+						navrouteQueryResult.detail = navrouteDetail;
+						
+						navrouteQueryResultsArr.addItem(navrouteQueryResult);
+					}
+				}
+				else//驾车查询
+				{ 
+					navrouteQueryResultsArr = new ArrayCollection();
+					var navrouteQueryResult:Object = new Object();
+					var navrouteDetail:ArrayCollection = new ArrayCollection();
+					var navrouteDetailper:Object;
+					var duration:Number = Number(result.duration);
+					var min:String = Math.round(duration/60)+"分钟";
+					var distance:String = Math.round(result.distance) + "公里";
+					
+					var describeStr:String = "总时间约：" + min + "，总距离：" +distance;
+					navrouteQueryResult.title = describeStr;
+					
+					//显示该方案每段的描述信息
+					navrouteDetailper = new Object();
+					navrouteDetailper.txt = "起点：" + startPositionName;
+					
+					navrouteDetail.addItem(navrouteDetailper);
+					
+					var numRoutes:int = result.simple.item.length();
+					
+					for (var m:int = 0; m < numRoutes; m++) {
+						var route:XML = result.simple.item[m];
+						var guideStr:String = (m+1) + ". "+ route.strguide;
+						
+						var obj:Object = new Object();
+						//obj = setGraphicroute(route,symcarPoint,symcarLine);
+						
+						navrouteDetailper = new Object();
+						navrouteDetailper.txt = guideStr;
+						navrouteDetailper.gra2 = obj;
+						navrouteDetail.addItem(navrouteDetailper);
+						
+						//显示该方案每段的详细描述信息
+						var numStepsStr:String = "";
+						var segmentSteps:String = route.segmentNumber;
+						var steps_s:Number;
+						var steps_e:Number;
+						if(!isNaN(Number(segmentSteps))){
+							steps_s = Number(segmentSteps);
+							steps_e = Number(segmentSteps);
+						}else{
+							steps_s=parseInt(segmentSteps.split("-")[0]);
+							steps_e=parseInt(segmentSteps.split("-")[1]);
+						}
+						var count:Number = 0;
+						for (var n:int = steps_s; n < steps_e+1; n++) {
+							var step:XML = result.routes.item[n];
+							var lngLat:String = step.turnlatlon;
+							var lng:Number = lngLat.split(",")[0];
+							var lat:Number = lngLat.split(",")[1];
+							
+							count++;
+							var stepStr:String = count + ") "+ step.strguide;
+							
+							navrouteDetailper = new Object();
+							navrouteDetailper.txt = stepStr;
+							
+							navrouteDetail.addItem(navrouteDetailper);
+						}
+						
+					}
+					navrouteDetailper = new Object();
+					navrouteDetailper.txt = "终点：" + endPositionName;
+					navrouteDetail.addItem(navrouteDetailper);
+					navrouteQueryResult.detail = navrouteDetail;
+					
+					navrouteQueryResultsArr.addItem(navrouteQueryResult);
+				} 
+				
+			}
+			
+			//公交路线 line 解析polyline等对象
+			private function setGraphicline(lineObj:Object,sbolpoint:Symbol,sbolline:Symbol):Object
+			{
+				var pointStart:MapPoint = str2Point(lineObj.stationStart.lonlat);
+				var pointEnd:MapPoint = str2Point(lineObj.stationEnd.lonlat);
+				var arr:Array = new Array();
+				var arrstr:String = lineObj.segmentLine[0].linePoint;
+				var arrtmp:Array = arrstr.split(";");
+				for each(var st:String in arrtmp)
+				{
+					if(StringUtil.trim(st))
+						arr.push(str2Point(st));
+				}
+				var pLine:Polyline = new Polyline();
+				pLine.addPath(arr);
+				
+				if(sbolpoint)
+				{
+					var graphicStart:Graphic = new Graphic(pointStart as Geometry, sbolpoint);
+					var graphicEnd:Graphic = new Graphic(pointEnd as Geometry, sbolpoint);
+					
+				}
+				if(sbolline)
+					var linegraphic:Graphic = new Graphic(pLine as Geometry, sbolline);
+				
+				var graphObj:Object = new Object();
+				graphObj.graStart = graphicStart;
+				graphObj.graEnd = graphicEnd;
+				graphObj.graLine = linegraphic;	
+				return graphObj;
+			}
+			
+			//驾车路线 route 解析polyline等对象
+			private function setGraphicroute(routeObj:Object,sbolpoint:Symbol,sbolline:Symbol):Object
+			{
+				//var pointTurn:MapPoint = str2Point(routeObj.turnlatlon);
+				var arr:Array = new Array();
+				var arrstr:String = routeObj.streetLatLon;
+				var arrtmp:Array = arrstr.split(";");
+				for each(var st:String in arrtmp)
+				{
+					if(StringUtil.trim(st))
+						arr.push(str2Point(st));
+				}
+				var pLine:Polyline = new Polyline();
+				pLine.addPath(arr);
+				
+				//var graphicTurn:Graphic = new Graphic(pointTurn as Geometry, sbolpoint);
+				var linegraphic:Graphic = new Graphic(pLine as Geometry, sbolline);
+				
+				var graphObj:Object = new Object();
+				//graphObj.graTurn = graphicTurn;
+				graphObj.graLine = linegraphic;	
+				return graphObj;
+			}
+			
+			//点经纬度坐标字符串转换成点对象
+			private function str2Point(str:String):MapPoint
+			{
+				var arr:Array = str.split(",");
+				var point:MapPoint = new MapPoint(arr[0],arr[1]);
+				return point;
+			}
+			
+			private function getLineName(LineName:String):Array{
+				for(var lines:Array=LineName.split("|"),c:int=0;c<lines.length;c++)
+					lines[c]||lines.splice(c,1);
+				return lines;
+			}
+			private function getDuration(line:Object):String{
+				var segs:int = line.segments.length;
+				var duration:Number = 0;
+				for(var a:int = 0; a < segs; a++){
+					var time:Number = line.segments[a].segmentLine[0].segmentTime;
+					duration += time;
+				}
+				return duration.toString();
+			}
+			private function getDistance(line:Object):String{
+				var segs:int = line.segments.length;
+				var distance:Number = 0;
+				for(var b:int = 0; b < segs; b++){
+					var segDistance:Number = line.segments[b].segmentLine[0].segmentDistance;
+					distance += segDistance;
+				}
+				return (distance/1000).toFixed(1);
+			}
+			
+
+		]]>
+		
+	</fx:Script>
+	
+	<s:BorderContainer width="100%" height="100%">
+		<s:HGroup width="100%" height="100%">
+			<s:Group width="80%" height="100%">
+				<esri:Map id="map" crosshairVisible="true">	
+				</esri:Map>
+			</s:Group>
+			
+			<s:BorderContainer backgroundColor="#D6FAED" width="20%" height="100%">
+				<s:VGroup gap="10" width="100%" height="100%">
+					<s:Group height="10%" width="100%">
+						<s:HGroup gap="{qdInput.width/6}" width="100%">
+							<s:TextInput id="qdInput"   height="100%" width="30%" borderVisible="true" fontFamily="宋体" fontSize="15" contentBackgroundAlpha="1.0" focusColor="#ececec"/>
+							<s:TextInput id="zdInput"   height="100%" width="30%" borderVisible="true" fontFamily="宋体" fontSize="15" contentBackgroundAlpha="1.0" focusColor="#ececec"/>
+							<s:Button id="dhcx" width="30%" height="100%" right="0"  click="dhcxClick('cx')">
+								公交
+							</s:Button>
+						</s:HGroup>
+					</s:Group>
+					<s:Group height="40%" width="100%">
+						<mx:TabNavigator id="navQueryResult"  width="100%" height="{this.height}" 
+										 borderVisible="true" borderColor="0x004C87"  borderStyle="solid">
+							
+							<s:NavigatorContent id="queryqdResultPanel" width="100%"  height="{this.height-80}" label="起点查询结果"  fontFamily="宋体" fontSize="14">
+								<mx:Canvas verticalScrollPolicy="auto" horizontalScrollPolicy="off" width="243" height="{this.height-110}">
+									<s:DataGroup dataProvider="{navQueryqdResultsArr}" mouseOver="datagroup1_mouseOverHandler(event)" 
+												 click="datagroup1_clickHandler(event)" itemRenderer="queryResultItemRender" >	
+										<s:layout>  
+											<s:VerticalLayout gap="2" useVirtualLayout="true"/>  
+										</s:layout> 	
+									</s:DataGroup>
+								</mx:Canvas>
+								<mx:HBox verticalAlign="middle"  left="3" horizontalGap="2" height="30" width="100%" bottom="0" fontSize="12">  
+									<s:Button label="首页" id="qdfst" width="45" buttonMode="true" click="first('qd')" enabled="false"/>  
+									<s:Button label="上一页" id="qdpre" width="60" buttonMode="true" click="previous('qd')" enabled="false"/>  
+									<s:Button label="下一页" id="qdnex" width="60" buttonMode="true" click="next('qd')" enabled="false"/> 
+									<s:Button label="末页" id="qdlst" width="45" buttonMode="true" click="last('qd')" enabled="false"/>  
+								</mx:HBox>  
+							</s:NavigatorContent>
+							<s:NavigatorContent id="queryzdResultPanel" width="100%"  height="{this.height-80}" label="终点查询结果"  fontFamily="宋体" fontSize="14">
+								<mx:Canvas verticalScrollPolicy="auto" horizontalScrollPolicy="off" width="243" height="{this.height-110}">
+									<s:DataGroup dataProvider="{navQueryzdResultsArr}" mouseOver="datagroup1_mouseOverHandler(event)" 
+												 click="datagroup3_clickHandler(event)" itemRenderer="queryResultItemRender" >	
+										<s:layout>  
+											<s:VerticalLayout gap="2" useVirtualLayout="true"/>  
+										</s:layout> 	
+									</s:DataGroup>
+								</mx:Canvas>
+								<mx:HBox verticalAlign="middle"  left="3" horizontalGap="2" height="30" width="100%" bottom="0" fontSize="12">  
+									<s:Button label="首页" id="zdfst" width="45" buttonMode="true" click="first('zd')" enabled="false"/>  
+									<s:Button label="上一页" id="zdpre" width="60" buttonMode="true" click="previous('zd')" enabled="false"/>  
+									<s:Button label="下一页" id="zdnex" width="60" buttonMode="true" click="next('zd')" enabled="false"/> 
+									<s:Button label="末页" id="zdlst" width="45" buttonMode="true" click="last('zd')" enabled="false"/>  
+								</mx:HBox>  
+							</s:NavigatorContent>
+							<s:NavigatorContent id="routeResultPanel" width="100%"  height="{this.height-80}" label="导航路线" fontFamily="宋体"  fontSize="14">
+								<mx:Canvas verticalScrollPolicy="auto"  horizontalScrollPolicy="off" width="243" height="{this.height-80}">
+									<s:DataGroup dataProvider="{navrouteQueryResultsArr}" click="datagroup2_clickHandler(event)" itemRenderer="routeResultItemRender" >	
+										<s:layout>  
+											<s:VerticalLayout gap="2" useVirtualLayout="true"/>  
+										</s:layout>  
+									</s:DataGroup>
+								</mx:Canvas>	
+							</s:NavigatorContent>
+						</mx:TabNavigator>
+						
+					</s:Group>
+				</s:VGroup>
+			</s:BorderContainer>
+		</s:HGroup>
+	</s:BorderContainer>
+</s:Application>

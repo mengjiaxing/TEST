@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="true">
+	
+	<fx:Script>
+		<![CDATA[
+
+			
+		]]>
+	</fx:Script>
+	
+<fx:Declarations>
+	<s:SolidColorStroke id="st" weight="1" color="0xcccccc"/>
+</fx:Declarations>
+		<s:Group width="230">
+
+			<mx:VBox id="result" borderColor="0xcccccc" width="100%" left="2" paddingBottom="5" paddingTop="5" >
+					<s:Label toolTip="名称：{data.NAME}"
+							 fontWeight="normal"
+							 text="名称：{data.NAME}" color="black"/>
+					<s:Label toolTip="地址：{data.ADDRESS}"
+							 fontWeight="normal"
+							 text="地址：{data.ADDRESS}" color="black"/>
+					<s:Label toolTip="电话：{data.TELEPHONE}"
+							 fontWeight="normal"
+							 text="电话：{data.TELEPHONE}" color="black"/>
+				
+			</mx:VBox>
+			<s:Button label="设为{data.LABEL}" verticalCenter="0" right="10" id="bt" visible="true"/>
+		</s:Group>
+		<s:Line stroke="{st}"  width="210" x="10"/>
+</s:ItemRenderer>

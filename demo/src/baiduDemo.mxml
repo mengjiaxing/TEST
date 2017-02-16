@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:esri="http://www.esri.com/2008/ags"
+			   creationComplete="initBD()"
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.BaiDuLayer
+			import com.esri.ags.geometry.MapPoint;
+			import com.esri.ags.layers.ArcGISTiledMapServiceLayer;
+			import com.esri.ags.layers.Layer;
+			import com.esri.ags.layers.supportClasses.LOD;
+			
+			
+			function initBD():void{
+				var bdslLayer:BaiDuLayer=new BaiDuLayer("Vector");
+				var bdyxlayer:BaiDuLayer=new BaiDuLayer("Image");
+				bdslLayer.id="bdslLayer";
+				bdyxlayer.id="bdyxlayer";
+				bdslLayer.visible=true;
+				bdyxlayer.visible=false;
+				map.lods=bdslLayer._tileInfo.lods;
+				map.addLayer(bdslLayer,1);
+				map.addLayer(bdyxlayer,0);
+				
+			}
+
+			public function linkToBDClick(key:String):void
+			{
+				
+				if(key=="bdyxLayer")
+				{
+					map.getLayer("bdslLayer").visible=false;
+					map.getLayer("bdyxlayer").visible=true;
+					
+				}
+				if(key=="bdslLayer")
+				{
+					map.getLayer("bdyxlayer").visible=false;
+					map.getLayer("bdslLayer").visible=true;
+
+				}
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<esri:Map id="map" crosshairVisible="true">	
+	</esri:Map>
+	<mx:Button id="btn1" name="影像地图" click="linkToBDClick('bdyxLayer')">	
+	</mx:Button>
+	<mx:Button id="btn2" name="电子地图" left="100" click="linkToBDClick('bdslLayer')">
+	</mx:Button>
+	
+</s:Application>

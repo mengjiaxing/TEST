@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:esri="http://www.esri.com/2008/ags"
+			   creationComplete="initJTY()"
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600">
+	<fx:Script>
+		<![CDATA[
+			import com.esri.ags.geometry.MapPoint;
+			import com.esri.ags.layers.ArcGISTiledMapServiceLayer;
+			import com.esri.ags.layers.Layer;
+
+			
+			function initJTY():void{
+				 
+				var wmslayer:ArcGISTiledMapServiceLayer=new ArcGISTiledMapServiceLayer("http://59.215.225.198:8080/OneMapServer/rest/services/DZDT/MapServer");
+				wmslayer.id="wmslayer";
+				wmslayer.visible=true;
+				map.addLayer(Layer(wmslayer),0);
+				map.level=8;
+				map.centerAt(new MapPoint(106.691417,26.712887));//贵州
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:BorderContainer width="100%" height="100%">
+		<s:VGroup width="100%" height="100%" gap="0">
+			<s:Group width="100%" height="16%" >
+			    <s:BorderContainer width="100%" height="100%" backgroundColor="#FFFFFF" borderVisible="false">
+					<mx:Image source="com/banner.gif" height="100%">
+						
+					</mx:Image>
+				</s:BorderContainer>
+				
+			</s:Group>
+			
+			<s:Group width="100%" height="84%">
+				<s:HGroup width="100%" height="100%" gap="0">
+					<s:Group height="100%" width="5%">
+						<s:BorderContainer width="100%" height="100%" backgroundColor="#FFFFFF" borderVisible="false">
+							<s:VGroup  gap="1" left="0" width="100%">
+								<s:Group  left="0" top="{back.height}"  click="" buttonMode="true" mouseOver="{back.visible=false;backDown.visible=true;}" mouseOut="{back.visible=true;backDown.visible=false}">
+									<mx:Image id="back" source="NewBanShi/tb_01.gif"  />
+									<mx:Image id="backDown" source="NewBanShi/tb1_01.gif" visible="false" />	
+								</s:Group>
+								<s:Group id="category"  left="0" mouseOut="{lb.visible=true;lbxz.visible=false;}"  mouseOver="{lb.visible=false;lbxz.visible=true;}">
+									<mx:Image id="lbxz" click="" source="NewBanShi/tb_02.gif" buttonMode="true" />
+									<mx:Image id="lb" click="" source="NewBanShi/tb1_02.gif" buttonMode="true"/>		
+								</s:Group>
+								
+								<!--综合查询-->
+								<s:Group   left="0"  mouseOut="{zhcxxz.visible=false;zhcx.visible=true;}"  mouseOver="{zhcxxz.visible=true;zhcx.visible=false;}" >
+									<mx:Image id="zhcxxz"  click="" visible="false"   source="NewBanShi/tb_03.gif" buttonMode="true"/>
+									<mx:Image id="zhcx" click=""   source="NewBanShi/tb1_03.gif" buttonMode="true" />
+								</s:Group>
+								<!--旅游资源查询-->
+								<s:Group mouseOut="{lyzy.visible=true;lyzyxz.visible=false;}" mouseOver="{lyzy.visible=false;lyzyxz.visible=true;}">
+									<mx:Image id="lyzyxz" click="" source="NewBanShi/tb_06.gif" buttonMode="true" />
+									<mx:Image id="lyzy" click="" source="NewBanShi/tb1_06.gif" buttonMode="true" />	
+								</s:Group>
+								
+								<!--统计-->
+								<s:Group   left="0"  mouseOut="{tjxz.visible=false;tj.visible=true;}"  mouseOver="{tjxz.visible=true;tj.visible=false;}" >
+									<mx:Image id="tjxz" click="" visible="false"   source="NewBanShi/tb_07.gif" buttonMode="true"/>
+									<mx:Image id="tj" click=""   source="NewBanShi/tb1_07.gif" buttonMode="true" />
+								</s:Group>
+								<!--分析-->
+								<s:Group   left="0"  mouseOut="{fxxz.visible=false;fx.visible=true;}"  mouseOver="{fxxz.visible=true;fx.visible=false;}" >
+									<mx:Image id="fxxz" click="" visible="false"   source="NewBanShi/tb_05.gif" buttonMode="true"/>
+									<mx:Image id="fx" click=""   source="NewBanShi/tb1_05.gif" buttonMode="true" />
+								</s:Group>
+								
+								<!--地图 影像-->
+								<s:Group id="mapAll"  left="0"  mouseOut="{}"  mouseOver="{}" >
+									<!--	<mx:Image id="dtxz" click="yxclick()" visible="false"   source="image/{this.parentApplication.resX}/NewBanShi/sl_J.png" buttonMode="true"/>-->
+									<mx:Image id="dt" source="NewBanShi/tb_08.gif" buttonMode="true" />
+									
+								</s:Group>
+								
+							</s:VGroup>
+						</s:BorderContainer>
+					</s:Group>
+					
+					<s:Group height="100%" width="95%">
+						<s:BorderContainer width="100%" height="100%" borderVisible="false">
+							<esri:Map id="map" crosshairVisible="true">	
+								
+							</esri:Map>
+						</s:BorderContainer>
+					</s:Group>
+				</s:HGroup>
+			</s:Group>
+		</s:VGroup>
+	</s:BorderContainer>
+</s:Application>

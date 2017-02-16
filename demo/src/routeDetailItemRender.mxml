@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="true" initialize="itemrenderer1_initializeHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			protected function itemrenderer1_initializeHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<s:SolidColorStroke id="st" weight="1" color="0xcccccc"/>
+	</fx:Declarations>
+
+		<s:Group width="217">
+			<mx:VBox>
+				<mx:HBox>
+					<s:Label text="{data.txt}" width="212" paddingTop="5" paddingBottom="5" verticalCenter="0"/>
+				</mx:HBox>
+			</mx:VBox>
+		</s:Group>
+	<s:Line stroke="{st}"  width="185" x="15"/>
+</s:ItemRenderer>

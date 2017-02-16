@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="true">
+	
+	<fx:Script>
+		<![CDATA[
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		
+	</fx:Declarations>
+
+		<s:Group width="220">
+			<mx:VBox borderColor="0xcccccc" width="100%" left="2" borderStyle="solid"
+					 paddingBottom="5" paddingTop="5" paddingLeft="5">
+				<s:Label id="title" text="{data.title}" width="210" verticalCenter="0" color="#6689CB" backgroundColor="#E4EBF8"/>
+				
+				<s:DataGroup  dataProvider="{data.detail}" itemRenderer="routeDetailItemRender">
+					<s:layout>  
+						<s:VerticalLayout gap="2" useVirtualLayout="true"/>  
+					</s:layout>  
+				</s:DataGroup>
+			</mx:VBox>
+		</s:Group>
+		
+
+</s:ItemRenderer>
